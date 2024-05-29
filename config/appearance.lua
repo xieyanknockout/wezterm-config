@@ -37,6 +37,9 @@ return {
    show_tab_index_in_tab_bar = false,
    switch_to_last_active_tab_when_closing_tab = true,
 
+   -- window decoration
+   window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
+
    -- window
    window_padding = {
       left = 5,
