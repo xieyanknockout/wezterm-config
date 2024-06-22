@@ -1,6 +1,7 @@
 local wezterm = require('wezterm')
 local gpu_adapters = require('utils.gpu_adapter')
-local colors = require('colors.custom')
+-- local colors = require('colors.custom')
+local scheme = wezterm.get_builtin_color_schemes()['MaterialDesignColors']
 
 return {
    animation_fps = 60,
@@ -10,7 +11,24 @@ return {
    webgpu_preferred_adapter = gpu_adapters:pick_best(),
 
    -- color scheme
-   colors = colors,
+   color_scheme = 'MaterialDesignColors',
+   -- color_scheme_dirs = { os.getenv("HOME") .. "\\.config\\wezterm\\colors" },
+   -- colors = colors,
+   colors = {
+      tab_bar = {
+         background = scheme.background,
+         new_tab = { bg_color = '#2e3440', fg_color = scheme.ansi[8], intensity = 'Bold' },
+         new_tab_hover = {
+            bg_color = scheme.ansi[1],
+            fg_color = scheme.brights[8],
+            intensity = 'Bold',
+         },
+         -- format-tab-title
+         -- active_tab = { bg_color = "#121212", fg_color = "#FCE8C3" },
+         -- inactive_tab = { bg_color = scheme.background, fg_color = "#FCE8C3" },
+         -- inactive_tab_hover = { bg_color = scheme.ansi[1], fg_color = "#FCE8C3" },
+      },
+   },
 
    -- background
    background = {
@@ -19,10 +37,10 @@ return {
          horizontal_align = 'Center',
       },
       {
-         source = { Color = colors.background },
+         source = { Color = scheme.background },
          height = '100%',
          width = '100%',
-         opacity = 0.96,
+         opacity = 0.95,
       },
    },
 
