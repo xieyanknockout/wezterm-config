@@ -1,7 +1,7 @@
 local wezterm = require('wezterm')
 local gpu_adapters = require('utils.gpu_adapter')
 -- local colors = require('colors.custom')
-local scheme = wezterm.get_builtin_color_schemes()['MaterialDesignColors']
+local scheme = wezterm.get_builtin_color_schemes()['Monokai Soda']
 
 return {
    animation_fps = 60,
@@ -11,7 +11,7 @@ return {
    webgpu_preferred_adapter = gpu_adapters:pick_best(),
 
    -- color scheme
-   color_scheme = 'MaterialDesignColors',
+   color_scheme = 'Material (terminal.sexy)',
    -- color_scheme_dirs = { os.getenv("HOME") .. "\\.config\\wezterm\\colors" },
    -- colors = colors,
    colors = {
