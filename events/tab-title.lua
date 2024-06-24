@@ -15,9 +15,12 @@ local __cells__ = {} -- wezterm FormatItems (ref: https://wezfurlong.org/wezterm
 
 -- stylua: ignore
 local colors = {
-   default   = { bg = '#45475a', fg = '#1c1b19' },
-   is_active = { bg = '#7FB4CA', fg = '#11111b' },
-   hover     = { bg = '#587d8c', fg = '#1c1b19' },
+   -- default   = { bg = '#45475a', fg = '#1c1b19' },
+   -- is_active = { bg = '#7FB4CA', fg = '#11111b' },
+   -- hover     = { bg = '#587d8c', fg = '#1c1b19' },
+  default = {bg = '#4E4E4E',fg='#1C1B19'},
+  is_active = {bg='#FBB829',fg='#1C1B19'},
+  hover={bg='#FF8700',fg='#1C1B19`'},
 }
 
 local _set_process_name = function(s)

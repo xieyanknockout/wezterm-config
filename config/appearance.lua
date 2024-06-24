@@ -17,7 +17,11 @@ return {
    colors = {
       tab_bar = {
          background = scheme.background,
-         new_tab = { bg_color = '#2e3440', fg_color = scheme.ansi[8], intensity = 'Bold' },
+         new_tab = {
+            bg_color = scheme.background,
+            fg_color = scheme.foreground,
+            intensity = 'Bold',
+         },
          new_tab_hover = {
             bg_color = scheme.ansi[1],
             fg_color = scheme.brights[8],
@@ -51,7 +55,7 @@ return {
    enable_tab_bar = true,
    hide_tab_bar_if_only_one_tab = false,
    use_fancy_tab_bar = false,
-   tab_max_width = 25,
+   tab_max_width = 45,
    show_tab_index_in_tab_bar = false,
    switch_to_last_active_tab_when_closing_tab = true,
 
@@ -60,10 +64,10 @@ return {
 
    -- window
    window_padding = {
-      left = 5,
-      right = 10,
-      top = 12,
-      bottom = 7,
+      left = 0,
+      right = 0,
+      top = 0,
+      bottom = 0,
    },
    window_close_confirmation = 'NeverPrompt',
    window_frame = {
