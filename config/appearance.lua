@@ -11,7 +11,8 @@ return {
    webgpu_preferred_adapter = gpu_adapters:pick_best(),
 
    -- color scheme
-   color_scheme = 'Material (terminal.sexy)',
+   color_scheme = 'MaterialDesignColors',
+   -- color_scheme_dirs = { os.getenv("HOME") .. ',
    -- color_scheme_dirs = { os.getenv("HOME") .. "\\.config\\wezterm\\colors" },
    -- colors = colors,
    colors = {
