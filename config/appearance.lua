@@ -17,7 +17,8 @@ return {
    -- colors = colors,
    colors = {
       tab_bar = {
-         background = scheme.background,
+         background = 'rgba(0, 0, 0, 0)',
+         -- background = scheme.background,
          new_tab = {
             bg_color = scheme.background,
             fg_color = scheme.foreground,
@@ -63,6 +64,10 @@ return {
    -- window decoration
    window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
 
+   -- integrated buttons
+   integrated_title_buttons = { 'Hide', 'Maximize' },
+   integrated_title_button_color = 'rgba(0,0,0,0)',
+   integrated_title_button_style = 'Windows',
    -- window
    window_padding = {
       left = 0,
