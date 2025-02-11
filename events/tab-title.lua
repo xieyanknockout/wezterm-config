@@ -42,8 +42,12 @@ local _set_title = function(process_name, base_title, max_width, inset)
       local diff = title:len() - max_width + inset
       title = wezterm.truncate_right(title, title:len() - diff)
    end
+   -- 计算左右填充，使标题占满整个宽度
+   local pad_total = (max_width - inset-12) - title:len()
+   local left_pad = math.floor(pad_total / 2)
+   local right_pad = pad_total - left_pad
 
-   return title
+   return string.rep(' ', left_pad) .. title .. string.rep(' ', right_pad)
 end
 
 local _check_if_admin = function(p)
