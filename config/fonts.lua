@@ -2,7 +2,8 @@ local wezterm = require('wezterm')
 local platform = require('utils.platform')
 
 -- local font = 'JetBrainsMono Nerd Font'
-local font = 'MesloLGM Nerd Font'
+-- local font = 'MesloLGM Nerd Font'
+local font = 'Maple Mono NF CN'
 local font_size = platform().is_mac and 12 or 14
 
 return {

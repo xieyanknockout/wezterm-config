@@ -8,13 +8,17 @@ local options = {
 if platform.is_win then
    options.default_prog = { 'powershell' }
    options.launch_menu = {
-      { label = 'PowerShell Desktop', args = { 'powershell' } },
+      { label = 'PowerShell 5', args = { 'powershell' } },
       { label = 'Command Prompt', args = { 'cmd' } },
-      {
-         label = 'Git Bash',
-         args = { 'C:\\Users\\kevin\\scoop\\apps\\git\\current\\bin\\bash.exe' },
-      },
    }
+   if platform.has_pwsh then
+    options.default_prog = { 'pwsh' }
+    options.launch_menu = {
+       { label = 'PowerShell 7', args = { 'pwsh' } },
+       { label = 'PowerShell 5', args = { 'powershell' } },
+       { label = 'Command Prompt', args = { 'cmd' } },
+    }
+   end
 elseif platform.is_mac then
    options.default_prog = { '/opt/homebrew/bin/fish', '-l' }
    options.launch_menu = {
