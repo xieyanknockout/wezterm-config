@@ -1,94 +1,64 @@
 local wezterm = require('wezterm')
 
--- Inspired by https://github.com/wez/wezterm/discussions/628#discussioncomment-1874614
-
-local nf = wezterm.nerdfonts
-
-local GLYPH_SEMI_CIRCLE_LEFT = nf.ple_left_half_circle_thick --[[ '' ]]
-local GLYPH_SEMI_CIRCLE_RIGHT = nf.ple_right_half_circle_thick --[[ '' ]]
-local GLYPH_CIRCLE = nf.fa_circle --[[ '' ]]
-local GLYPH_ADMIN = nf.md_shield_half_full --[[ '󰞀' ]]
-
 local M = {}
 
-local __cells__ = {} -- wezterm FormatItems (ref: https://wezfurlong.org/wezterm/config/lua/wezterm/format.html)
-
--- stylua: ignore
-local colors = {
-   -- default   = { bg = '#45475a', fg = '#1c1b19' },
-   -- is_active = { bg = '#7FB4CA', fg = '#11111b' },
-   -- hover     = { bg = '#587d8c', fg = '#1c1b19' },
-  default = {bg = '#4E4E4E',fg='#1C1B19'},
-  is_active = {bg='#FBB829',fg='#1C1B19'},
-  hover={bg='#FF8700',fg='#1C1B19`'},
-}
-
-local _set_process_name = function(s)
+-- 获取进程名
+local function get_process_name(s)
    local a = string.gsub(s, '(.*[/\\])(.*)', '%2')
    return a:gsub('%.exe$', '')
 end
 
-local _set_title = function(process_name, base_title, max_width, inset)
-   local title
-   inset = inset or 6
-
-   if process_name:len() > 0 then
-      title = process_name .. ' ~ ' .. base_title
-   else
-      title = base_title
+-- 获取简短的当前目录
+local function get_short_cwd(pane)
+   local cwd = pane.current_working_dir
+   if not cwd then
+      return ''
    end
 
-   if title:len() > max_width - inset then
-      local diff = title:len() - max_width + inset
-      title = wezterm.truncate_right(title, title:len() - diff)
+   -- 替换 HOME 为 ~
+   local home = os.getenv('HOME') or os.getenv('USERPROFILE')
+   if home and cwd:find(home, 1, true) == 1 then
+      cwd = '~' .. cwd:sub(#home + 1)
    end
-   -- 计算左右填充，使标题占满整个宽度
-   local pad_total = (max_width - inset-12) - title:len()
-   local left_pad = math.floor(pad_total / 2)
-   local right_pad = pad_total - left_pad
 
-   return string.rep(' ', left_pad) .. title .. string.rep(' ', right_pad)
-end
-
-local _check_if_admin = function(p)
-   if p:match('^Administrator: ') then
-      return true
+   -- 只取最后两个目录
+   local parts = {}
+   for part in cwd:gmatch('[/\\]+([^/\\]+)') do
+      table.insert(parts, part)
    end
-   return false
-end
 
----@param fg string
----@param bg string
----@param attribute table
----@param text string
-local _push = function(bg, fg, attribute, text)
-   table.insert(__cells__, { Background = { Color = bg } })
-   table.insert(__cells__, { Foreground = { Color = fg } })
-   table.insert(__cells__, { Attribute = attribute })
-   table.insert(__cells__, { Text = text })
+   if #parts > 2 then
+      return '…/' .. parts[#parts - 1] .. '/' .. parts[#parts]
+   elseif #parts > 0 then
+      return table.concat(parts, '/')
+   end
+
+   return cwd
 end
 
 M.setup = function()
-   wezterm.on('format-tab-title', function(tab, _tabs, _panes, _config, hover, max_width)
-      __cells__ = {}
+   wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
+      local cells = {}
 
-      local bg
-      local fg
-      local process_name = _set_process_name(tab.active_pane.foreground_process_name)
-      local is_admin = _check_if_admin(tab.active_pane.title)
-      local title = _set_title(process_name, tab.active_pane.title, max_width, (is_admin and 8))
-
+      -- 确定背景色和前景色
+      local bg, fg
       if tab.is_active then
-         bg = colors.is_active.bg
-         fg = colors.is_active.fg
+         bg = '#FBB829'  -- 活动标签黄色背景
+         fg = '#000000'  -- 纯黑前景，增强对比度
       elseif hover then
-         bg = colors.hover.bg
-         fg = colors.hover.fg
+         bg = '#FF8700'  -- 悬停橙色背景
+         fg = '#000000'
       else
-         bg = colors.default.bg
-         fg = colors.default.fg
+         bg = '#3A3A3A'  -- 非活动标签更深的灰色，降低视觉干扰
+         fg = '#AAAAAA'  -- 浅灰文字，让活动标签更突出
       end
 
+      -- 获取信息
+      local process_name = get_process_name(tab.active_pane.foreground_process_name)
+      local short_cwd = get_short_cwd(tab.active_pane)
+      local tab_index = tab.tab_index
+
+      -- 检查未读输出
       local has_unseen_output = false
       for _, pane in ipairs(tab.panes) do
          if pane.has_unseen_output then
@@ -97,29 +67,71 @@ M.setup = function()
          end
       end
 
-      -- Left semi-circle
-      _push('rgba(0, 0, 0, 0.4)', bg, { Intensity = 'Bold' }, GLYPH_SEMI_CIRCLE_LEFT)
+      -- Pane 数量
+      local pane_count = #tab.panes
+      local nf = wezterm.nerdfonts
 
-      -- Admin Icon
-      if is_admin then
-         _push(bg, fg, { Intensity = 'Bold' }, ' ' .. GLYPH_ADMIN)
+      -- 开始构建标签
+      -- 左边距
+      table.insert(cells, { Background = { Color = bg } })
+      table.insert(cells, { Foreground = { Color = fg } })
+      table.insert(cells, { Text = ' ' })
+
+      -- 索引号（加粗显示，使用深色提高可读性）
+      table.insert(cells, { Background = { Color = bg } })
+      table.insert(cells, { Foreground = { Color = tab.is_active and '#000000' or '#888888' } })
+      table.insert(cells, { Attribute = { Intensity = 'Bold' } })
+      table.insert(cells, { Text = tostring(tab_index) .. ' ' })
+
+      -- 进程名称
+      if process_name and process_name ~= '' then
+         table.insert(cells, { Background = { Color = bg } })
+         table.insert(cells, { Foreground = { Color = fg } })
+         table.insert(cells, { Attribute = { Intensity = 'Normal' } })
+         table.insert(cells, { Text = process_name })
       end
 
-      -- Title
-      _push(bg, fg, { Intensity = 'Bold' }, ' ' .. title)
+      -- Pane 数量
+      if pane_count > 1 then
+         table.insert(cells, { Background = { Color = bg } })
+         table.insert(cells, { Foreground = { Color = '#E67700' } })
+         table.insert(cells, { Attribute = { Intensity = 'Bold' } })
+         table.insert(cells, { Text = ' ' .. nf.md_split_horizontal .. pane_count })
+      end
 
-      -- Unseen output alert
+      -- 工作目录（非活动标签降低透明度）
+      if short_cwd and short_cwd ~= '' then
+         table.insert(cells, { Background = { Color = bg } })
+         -- 非活动标签使用更低的透明度
+         local cwd_color = tab.is_active and (fg .. '88') or (fg .. '44')
+         table.insert(cells, { Foreground = { Color = cwd_color } })
+         table.insert(cells, { Attribute = { Intensity = 'Normal' } })
+         table.insert(cells, { Text = ' │ ' .. short_cwd })
+      end
+
+      -- 时间（仅活动标签）
+      if tab.is_active then
+         local time_str = wezterm.strftime('%H:%M')
+         table.insert(cells, { Background = { Color = bg } })
+         table.insert(cells, { Foreground = { Color = '#1C7A0E' } })  -- 更深的绿色
+         table.insert(cells, { Attribute = { Intensity = 'Bold' } })
+         table.insert(cells, { Text = ' ' .. nf.md_clock .. time_str })
+      end
+
+      -- 未读输出指示
       if has_unseen_output then
-         _push(bg, '#FFA066', { Intensity = 'Bold' }, ' ' .. GLYPH_CIRCLE)
+         table.insert(cells, { Background = { Color = bg } })
+         table.insert(cells, { Foreground = { Color = '#E03131' } })
+         table.insert(cells, { Attribute = { Intensity = 'Bold' } })
+         table.insert(cells, { Text = ' ●' })
       end
 
-      -- Right padding
-      _push(bg, fg, { Intensity = 'Bold' }, ' ')
+      -- 右边距
+      table.insert(cells, { Background = { Color = bg } })
+      table.insert(cells, { Foreground = { Color = fg } })
+      table.insert(cells, { Text = ' ' })
 
-      -- Right semi-circle
-      _push('rgba(0, 0, 0, 0.4)', bg, { Intensity = 'Bold' }, GLYPH_SEMI_CIRCLE_RIGHT)
-
-      return __cells__
+      return cells
    end)
 end
 

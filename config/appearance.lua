@@ -17,22 +17,18 @@ return {
    -- colors = colors,
    colors = {
       tab_bar = {
-         background = 'rgba(0, 0, 0, 0)',
-         -- background = scheme.background,
+         background = '#2A2A2A', -- 深色背景，与非活动标签融合
+         -- 新建标签按钮样式
          new_tab = {
-            bg_color = scheme.background,
+            bg_color = scheme.ansi[2],
             fg_color = scheme.foreground,
             intensity = 'Bold',
          },
          new_tab_hover = {
-            bg_color = scheme.ansi[1],
-            fg_color = scheme.brights[8],
+            bg_color = '#FBB829',
+            fg_color = '#000000',
             intensity = 'Bold',
          },
-         -- format-tab-title
-         -- active_tab = { bg_color = "#121212", fg_color = "#FCE8C3" },
-         -- inactive_tab = { bg_color = scheme.background, fg_color = "#FCE8C3" },
-         -- inactive_tab_hover = { bg_color = scheme.ansi[1], fg_color = "#FCE8C3" },
       },
    },
 
@@ -55,11 +51,11 @@ return {
 
    -- tab bar
    enable_tab_bar = true,
-   hide_tab_bar_if_only_one_tab = false,
-   use_fancy_tab_bar = false,
-   tab_max_width = 999,
-   show_new_tab_button_in_tab_bar = false,
-   show_tab_index_in_tab_bar = false,
+   hide_tab_bar_if_only_one_tab = true, -- 单标签时隐藏，节省空间
+   use_fancy_tab_bar = true, -- 自定义格式需要启用 fancy tab bar
+   tab_max_width = 120, -- 限制最大宽度，保持美观
+   show_new_tab_button_in_tab_bar = true, -- 显示新建标签按钮
+   -- show_tab_index_in_tab_bar 由自定义 tab-title 处理
    switch_to_last_active_tab_when_closing_tab = true,
 
    -- window decoration
