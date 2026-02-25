@@ -1,14 +1,39 @@
 local wezterm = require('wezterm')
 local platform = require('utils.platform')
+local font_size_config = require('config.font_size')
 
--- local font = 'JetBrainsMono Nerd Font'
--- local font = 'MesloLGM Nerd Font'
-local fonts = {'Google Sans Code', 'Maple Mono NF CN', 'MesloLGM Nerd Font', 'JetBrainsMono Nerd Font'}
-local font_size = platform().is_mac and 12 or 14
+-- 字体列表（优先级从高到低）
+local fonts = {
+   -- 主字体
+   'Google Sans Code',
+   'Maple Mono NF CN',
+   'MesloLGM Nerd Font',
+   'JetBrainsMono Nerd Font',
+   -- 跨平台字体回退
+   { family = 'Cascadia Code', weight = 'Regular' },
+   { family = 'Consolas', weight = 'Regular' },  -- Windows
+   { family = 'SF Mono', weight = 'Regular' },    -- macOS
+   -- 符号和 Emoji
+   'Nerd Font Symbols',
+   'Noto Color Emoji',
+   'Segoe UI Emoji',  -- Windows
+   'Apple Color Emoji',  -- macOS
+}
+
+-- 使用统一的字体大小配置
+local font_size = font_size_config.base_font_size
+
+-- 平台特定调整
+if platform().is_mac then
+   font_size = font_size - 1  -- macOS 字体渲染通常较大
+end
 
 return {
    font = wezterm.font_with_fallback(fonts),
    font_size = font_size,
+
+   -- 当改变字体大小时调整窗口大小以保持行列数
+   adjust_window_size_when_changing_font_size = true,
 
    --ref: https://wezfurlong.org/wezterm/config/lua/config/freetype_pcf_long_family_names.html#why-doesnt-wezterm-use-the-distro-freetype-or-match-its-configuration
    freetype_load_target = 'Light', ---@type 'Normal'|'Light'|'Mono'|'HorizontalLcd'
