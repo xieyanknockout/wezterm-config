@@ -181,6 +181,78 @@ local keys = {
       action = act.PaneSelect({ alphabet = '1234567890', mode = 'SwapWithActiveKeepFocus' }),
    },
 
+   -- layout management --
+   -- 保存当前布局
+   {
+      key = 'S',
+      mods = mod.SUPER .. '|SHIFT',
+      action = wezterm.action_callback(function(window, pane)
+         window:perform_action(
+            act.PromptInputLine({
+               description = '输入布局名称以保存:',
+               action = wezterm.action_callback(function(win, _pane, line)
+                  if not line or line == '' then return end
+                  local ok, err = pcall(function()
+                     local lm = require('utils.layout_manager')
+                     local success, msg = lm.save_layout(win, line)
+                     if success then
+                        wezterm.log_info(msg)
+                     else
+                        wezterm.log_error(msg)
+                     end
+                  end)
+                  if not ok then
+                     wezterm.log_error('布局保存异常: ' .. tostring(err))
+                  end
+               end),
+            }),
+            pane
+         )
+      end),
+   },
+   -- 恢复已保存的布局
+   {
+      key = 'L',
+      mods = mod.SUPER .. '|SHIFT',
+      action = wezterm.action_callback(function(window, pane)
+         local layout_manager = require('utils.layout_manager')
+         local layouts = layout_manager.list_layouts()
+
+         if #layouts == 0 then
+            wezterm.log_info('没有已保存的布局')
+            return
+         end
+
+         -- 构建选择器选项
+         local choices = {}
+         for _, layout in ipairs(layouts) do
+            table.insert(choices, { label = layout.label, id = layout.name })
+         end
+
+         window:perform_action(
+            act.InputSelector({
+               title = '选择要恢复的布局',
+               choices = choices,
+               fuzzy = true,
+               fuzzy_description = '搜索布局: ',
+               action = wezterm.action_callback(function(win, _pane, id)
+                  if not id then return end
+                  local ok, layout = pcall(layout_manager.load_layout, id)
+                  if not layout then
+                     wezterm.log_info('[layout-restore] load failed: ' .. tostring(layout))
+                     return
+                  end
+                  local ok2, err = pcall(layout_manager.restore_layout, win, layout)
+                  if not ok2 then
+                     wezterm.log_info('[layout-restore] restore error: ' .. tostring(err))
+                  end
+               end),
+            }),
+            pane
+         )
+      end),
+   },
+
    -- key-tables --
    -- resizes fonts
    {

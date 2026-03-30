@@ -6,7 +6,7 @@ local font_size_config = require('config.font_size')
 local fonts = {
    -- 主字体
     { family = 'Maple Mono NF CN',           weight = 'ExtraLight' },
-    { family = 'LXGW WenKai Mono GB Screen', weight = 'Light' },
+    { family = 'LXGW WenKai Mono GB Screen', weight = 'ExtraLight' },
     { family = 'Google Sans Code', weight = 'Light' },
    'MesloLGM Nerd Font',
    'JetBrainsMono Nerd Font',

@@ -99,7 +99,8 @@ M.setup = function()
          table.insert(cells, { Background = { Color = bg } })
          table.insert(cells, { Foreground = { Color = '#E67700' } })
          table.insert(cells, { Attribute = { Intensity = 'Bold' } })
-         table.insert(cells, { Text = ' ' .. nf.md_split_horizontal .. pane_count })
+         local split_icon = nf.md_split_horizontal or nf.fa_columns or nf.md_table_column
+         table.insert(cells, { Text = ' ' .. (split_icon or '|') .. pane_count })
       end
 
       -- 工作目录（非活动标签降低透明度）
