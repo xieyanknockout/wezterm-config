@@ -8,21 +8,12 @@ local M = {}
 ---------------------------------------------------------------------------
 
 local function get_layout_dir()
-   return os.getenv('USERPROFILE') .. '/.config/wezterm/layouts'
+   return wezterm.config_dir .. '/layouts'
 end
 
--- 确保目录存在（仅在需要时调用，用 cmd mkdir 避免弹出 PowerShell 窗口）
 local function ensure_layout_dir()
    local dir = get_layout_dir()
-   -- 先尝试写临时文件探测目录是否存在
-   local test = io.open(dir .. '/.probe', 'w')
-   if test then
-      test:close()
-      os.remove(dir .. '/.probe')
-      return dir
-   end
-   -- 目录不存在，用 cmd 内置命令创建（不会弹出额外窗口）
-   os.execute('mkdir "' .. dir .. '" 2>NUL')
+   wezterm.mkdir(dir)
    return dir
 end
 
@@ -38,8 +29,8 @@ local function extract_cwd(pane)
       return nil
    end
    path = tostring(path)
-   -- 去掉 Windows 路径开头的斜杠: "/C:/Users/..." → "C:/Users/..."
-   if path:match('^/[A-Za-z]:') then
+   -- Windows 上 file_path 返回 "/C:/Users/..." 格式，去掉开头斜杠
+   if wezterm.target_triple:find('windows') and path:match('^/[A-Za-z]:') then
       path = path:sub(2)
    end
    return path
