@@ -5,8 +5,9 @@ local font_size_config = require('config.font_size')
 -- 字体列表（优先级从高到低）
 local fonts = {
    -- 主字体
-   'Google Sans Code',
-   'Maple Mono NF CN',
+    { family = 'Maple Mono NF CN',           weight = 'ExtraLight' },
+    { family = 'LXGW WenKai Mono GB Screen', weight = 'Light' },
+    { family = 'Google Sans Code', weight = 'Light' },
    'MesloLGM Nerd Font',
    'JetBrainsMono Nerd Font',
    -- 跨平台字体回退
@@ -31,6 +32,9 @@ end
 return {
    font = wezterm.font_with_fallback(fonts),
    font_size = font_size,
+
+   -- 禁用连字渲染以提升性能
+   harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
 
    -- 当改变字体大小时调整窗口大小以保持行列数
    adjust_window_size_when_changing_font_size = true,

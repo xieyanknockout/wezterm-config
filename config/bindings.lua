@@ -170,6 +170,11 @@ local keys = {
    { key = 'j',     mods = mod.SUPER_REV, action = act.ActivatePaneDirection('Down') },
    { key = 'h',     mods = mod.SUPER_REV, action = act.ActivatePaneDirection('Left') },
    { key = 'l',     mods = mod.SUPER_REV, action = act.ActivatePaneDirection('Right') },
+   -- 更直观的 Alt + 方向键切换 pane
+   { key = 'UpArrow',    mods = mod.SUPER, action = act.ActivatePaneDirection('Up') },
+   { key = 'DownArrow',  mods = mod.SUPER, action = act.ActivatePaneDirection('Down') },
+   { key = 'LeftArrow',  mods = mod.SUPER, action = act.ActivatePaneDirection('Left') },
+   { key = 'RightArrow', mods = mod.SUPER, action = act.ActivatePaneDirection('Right') },
    {
       key = 'p',
       mods = mod.SUPER_REV,

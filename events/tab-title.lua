@@ -15,6 +15,9 @@ local function get_short_cwd(pane)
       return ''
    end
 
+   -- 修复：转换为字符串，因为 cwd 可能是 WezTerm 的特殊路径对象
+   cwd = tostring(cwd)
+
    -- 替换 HOME 为 ~
    local home = os.getenv('HOME') or os.getenv('USERPROFILE')
    if home and cwd:find(home, 1, true) == 1 then

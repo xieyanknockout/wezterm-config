@@ -25,12 +25,20 @@ local function calculate_padding(font_size)
    }
 end
 
+-- 调试：输出选择的 GPU 信息
+local picked_gpu = gpu_adapters:pick_best()
+if picked_gpu then
+   wezterm.log_info('WezTerm GPU: ', picked_gpu.name, ' (', picked_gpu.device_type, ', ', picked_gpu.backend, ')')
+else
+   wezterm.log_info('WezTerm GPU: Using default (no specific adapter selected)')
+end
+
 return {
    animation_fps = 60,
    max_fps = 60,
    front_end = 'WebGpu',
    webgpu_power_preference = 'HighPerformance',
-   webgpu_preferred_adapter = gpu_adapters:pick_best(),
+   webgpu_preferred_adapter = picked_gpu,
 
    -- color scheme
    color_scheme = 'MaterialDesignColors',
@@ -96,7 +104,7 @@ return {
       font_size = titlebar_font_size,
    },
    inactive_pane_hsb = {
-      saturation = 0.9,
-      brightness = 0.65,
+      saturation = 0.5,  -- 更明显的去色效果（非激活 pane 变灰）
+      brightness = 0.4,  -- 更明显的变暗效果（非激活 pane 变暗）
    },
 }
