@@ -46,6 +46,7 @@ return {
    -- color_scheme_dirs = { os.getenv("HOME") .. "\\.config\\wezterm\\colors" },
    -- colors = colors,
    colors = {
+      foreground = '#F0F0F0',
       tab_bar = {
          background = '#2A2A2A', -- 深色背景，与非活动标签融合
          -- 新建标签按钮样式
@@ -72,7 +73,7 @@ return {
          source = { Color = scheme.background },
          height = '100%',
          width = '100%',
-         opacity = 0.95,
+         opacity = 0.97,
       },
    },
 

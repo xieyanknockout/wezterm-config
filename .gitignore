@@ -3,3 +3,6 @@
 /lua_modules
 /.luarocks
 .DS_Store
+
+# 布局文件（含设备特定路径，不纳入版本控制）
+layouts/*.json
