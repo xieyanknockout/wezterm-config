@@ -10,8 +10,9 @@ local titlebar_font_size = font_size_config.titlebar_font_size or base_font_size
 
 -- 根据字体大小计算其他尺寸
 local function calculate_tab_width(font_size)
-   -- Tab 宽度约为字体大小的 15-18 倍
-   return math.floor(font_size * 16)
+   -- Tab 宽度约为字体大小的 14-16 倍
+   -- hover 时展开内容需要足够空间
+   return math.floor(font_size * 15)
 end
 
 local function calculate_padding(font_size)
@@ -25,12 +26,16 @@ local function calculate_padding(font_size)
    }
 end
 
--- 调试：输出选择的 GPU 信息
-local picked_gpu = gpu_adapters:pick_best()
-if picked_gpu then
-   wezterm.log_info('WezTerm GPU: ', picked_gpu.name, ' (', picked_gpu.device_type, ', ', picked_gpu.backend, ')')
-else
-   wezterm.log_info('WezTerm GPU: Using default (no specific adapter selected)')
+-- GPU 适配器：缓存到 GLOBAL 避免每次 reload 重复枚举和打日志
+local picked_gpu = wezterm.GLOBAL.picked_gpu
+if not picked_gpu then
+   picked_gpu = gpu_adapters:pick_manual('Gl', 'DiscreteGpu')
+   wezterm.GLOBAL.picked_gpu = picked_gpu
+   if picked_gpu then
+      wezterm.log_info('WezTerm GPU: ', picked_gpu.name, ' (', picked_gpu.device_type, ', ', picked_gpu.backend, ')')
+   else
+      wezterm.log_info('WezTerm GPU: Using default (no specific adapter selected)')
+   end
 end
 
 return {
@@ -48,8 +53,19 @@ return {
    colors = {
       foreground = '#F0F0F0',
       tab_bar = {
-         background = '#2A2A2A', -- 深色背景，与非活动标签融合
-         -- 新建标签按钮样式
+         background = '#2A2A2A',
+         active_tab = {
+            bg_color = '#FBB829',
+            fg_color = '#000000',
+         },
+         inactive_tab = {
+            bg_color = '#3A3A3A',
+            fg_color = '#AAAAAA',
+         },
+         inactive_tab_hover = {
+            bg_color = '#FF8700',
+            fg_color = '#000000',
+         },
          new_tab = {
             bg_color = scheme.ansi[2],
             fg_color = scheme.foreground,
@@ -82,20 +98,16 @@ return {
 
    -- tab bar
    enable_tab_bar = true,
-   hide_tab_bar_if_only_one_tab = true, -- 单标签时隐藏，节省空间
-   use_fancy_tab_bar = true, -- 自定义格式需要启用 fancy tab bar
-   tab_max_width = calculate_tab_width(base_font_size), -- 根据字体大小自适应
-   show_new_tab_button_in_tab_bar = true, -- 显示新建标签按钮
-   -- show_tab_index_in_tab_bar 由自定义 tab-title 处理
+   hide_tab_bar_if_only_one_tab = true,
+   use_fancy_tab_bar = false, -- 非 fancy 模式：tab 渲染和点击热区完全一致
+   tab_bar_at_bottom = false,
+   tab_max_width = calculate_tab_width(base_font_size),
+   show_new_tab_button_in_tab_bar = true,
    switch_to_last_active_tab_when_closing_tab = true,
 
    -- window decoration
    window_decorations = 'RESIZE',
 
-   -- integrated buttons
-   integrated_title_buttons = { 'Hide', 'Maximize' },
-   integrated_title_button_color = 'rgba(0,0,0,0)',
-   integrated_title_button_style = 'Windows',
    -- window
    window_padding = calculate_padding(base_font_size),
    window_close_confirmation = 'NeverPrompt',

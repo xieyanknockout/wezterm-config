@@ -339,7 +339,12 @@ function M.restore_layout(window, layout_data)
    end
 
    -- 创建新 tab
-   window:perform_action(act.SpawnTab('CurrentPaneDomain'), window:active_pane())
+   local active_pane = window:active_pane()
+   if not active_pane then
+      wezterm.log_error('无法获取活跃 pane，取消布局恢复')
+      return false
+   end
+   window:perform_action(act.SpawnTab('CurrentPaneDomain'), active_pane)
    local tab = window:active_tab()
    if not tab then
       wezterm.log_error('无法创建新 tab')
@@ -364,13 +369,28 @@ function M.restore_layout(window, layout_data)
       split_count = split_count + 1
 
       -- 先激活目标 pane，再拆分（SplitPane 总是作用于活跃 pane）
-      window:perform_action(act.ActivatePaneByIndex(pane_idx), tab:active_pane())
+      local current_pane = tab:active_pane()
+      if not current_pane then
+         wezterm.log_error('[layout-restore] active_pane 为 nil，跳过 split #' .. split_count)
+         return
+      end
+      window:perform_action(act.ActivatePaneByIndex(pane_idx), current_pane)
+
+      current_pane = tab:active_pane()
+      if not current_pane then
+         wezterm.log_error('[layout-restore] ActivatePane 后 active_pane 为 nil，跳过 split #' .. split_count)
+         return
+      end
       window:perform_action(act.SplitPane({
          direction = direction,
          size = { Percent = pct },
-      }), tab:active_pane())
+      }), current_pane)
 
       local new_pane = tab:active_pane()
+      if not new_pane then
+         wezterm.log_error('[layout-restore] SplitPane 后 active_pane 为 nil，跳过后续恢复')
+         return
+      end
       local new_pane_id = new_pane:pane_id()
 
       -- 先处理左子树（原 pane 保留在 pane_idx，不受后续 split 影响）
