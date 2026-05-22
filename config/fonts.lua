@@ -3,13 +3,16 @@ local platform = require('utils.platform')
 local font_size_config = require('config.font_size')
 
 -- 字体列表（优先级从高到低）
+-- 如遇 Google Sans Code 加载警告：其 Variable 版支持 Proportional/Monospaced 双模式，
+-- WezTerm 可能误选 Proportional 版本。安装 Static 版可解决，从 googlefonts/googlesans-code 下载 v6.000+。
+-- 关联: wezterm#3639 #3944 #3931
 local fonts = { -- 主字体
 {
     family = 'Google Sans Code',
-    weight = 'ExtraLight'
+    weight = 300,
 }, {
     family = 'LXGW WenKai Mono GB Screen',
-    weight = 'Light'
+    weight = 'Regular',
 }, {
     family = 'Maple Mono NF CN',
     weight = 'ExtraLight'

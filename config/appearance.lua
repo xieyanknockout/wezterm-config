@@ -1,5 +1,6 @@
 local wezterm = require('wezterm')
 local gpu_adapters = require('utils.gpu_adapter')
+local platform = require('utils.platform')
 local font_size_config = require('config.font_size')
 -- local colors = require('colors.custom')
 local scheme = wezterm.get_builtin_color_schemes()['Monokai Soda']
@@ -29,7 +30,8 @@ end
 -- GPU 适配器：缓存到 GLOBAL 避免每次 reload 重复枚举和打日志
 local picked_gpu = wezterm.GLOBAL.picked_gpu
 if not picked_gpu then
-   picked_gpu = gpu_adapters:pick_manual('Gl', 'DiscreteGpu')
+   local preferred_backend = platform().is_win and 'Dx12' or 'Gl'
+   picked_gpu = gpu_adapters:pick_manual(preferred_backend, 'DiscreteGpu')
    wezterm.GLOBAL.picked_gpu = picked_gpu
    if picked_gpu then
       wezterm.log_info('WezTerm GPU: ', picked_gpu.name, ' (', picked_gpu.device_type, ', ', picked_gpu.backend, ')')
@@ -113,7 +115,7 @@ return {
    window_close_confirmation = 'NeverPrompt',
    window_frame = {
       active_titlebar_bg = '#090909',
-      font = wezterm.font('Google Sans Code', { weight = 'Bold' }),
+      font = wezterm.font('Google Sans Code', { weight = 'Bold' }), -- 若遇 font 加载警告见 config/fonts.lua 顶部排查文档
       font_size = titlebar_font_size,
    },
    inactive_pane_hsb = {
